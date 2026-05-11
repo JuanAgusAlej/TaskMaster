@@ -4,6 +4,11 @@
 
 Este proyecto fue desarrollado como parte de una entrega académica para la materia de Aplicaciones Móviles.
 
+## 🎥 Demo y Descarga
+¿Querés ver cómo funciona la aplicación en acción o probarla en tu dispositivo Android?
+- [Ver Demo en YouTube](https://www.youtube.com/shorts/WoTBJ5KoH1Q)
+- [Descargar APK (Google Drive)](https://drive.google.com/file/d/1GRgzXuatsc8JMsYADYxRoPiHMfr28FcY/view)
+
 ## ✨ Características Principales
 
 - **🔐 Autenticación Local:** 
