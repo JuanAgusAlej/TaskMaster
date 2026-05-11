@@ -1,0 +1,71 @@
+import { StyleSheet } from "react-native";
+import { COLORS, FONTS, SPACING } from "../../constants/theme";
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  inner: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: SPACING.xl,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 60,
+  },
+  logoText: {
+    ...FONTS.logo,
+    color: COLORS.textPrimary,
+    lineHeight: 56,
+  },
+  formContainer: {
+    width: '100%',
+  },
+  input: {
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.accent,
+    borderRadius: 8,
+    padding: SPACING.md,
+    color: COLORS.textPrimary,
+    ...FONTS.body,
+    marginBottom: SPACING.lg,
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.accent,
+    borderRadius: 8,
+    marginBottom: SPACING.lg,
+  },
+  passwordInput: {
+    flex: 1,
+    padding: SPACING.md,
+    color: COLORS.textPrimary,
+    ...FONTS.body,
+  },
+  eyeButton: {
+    padding: SPACING.md,
+  },
+  loginButton: {
+    marginTop: SPACING.md,
+  },
+  registerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: SPACING.xl,
+  },
+  registerText: {
+    color: COLORS.textSecondary,
+    ...FONTS.body,
+  },
+  registerLink: {
+    color: COLORS.accent,
+    ...FONTS.body,
+    fontWeight: 'bold',
+  },
+});
