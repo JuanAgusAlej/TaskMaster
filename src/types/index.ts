@@ -20,6 +20,7 @@ export interface Task {
   assignedContact?: AssignedContact;
   imageUri?: string;
   location?: LocationData;
+  calendarEventId?: string;
 }
 
 export interface User {

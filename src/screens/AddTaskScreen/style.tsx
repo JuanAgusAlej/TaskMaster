@@ -312,4 +312,20 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
   },
+  calendarSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: COLORS.surface,
+    padding: SPACING.md,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.accentMuted,
+    marginBottom: SPACING.lg,
+  },
+  calendarText: {
+    color: COLORS.textPrimary,
+    ...FONTS.body,
+    fontWeight: '600',
+  },
 });
