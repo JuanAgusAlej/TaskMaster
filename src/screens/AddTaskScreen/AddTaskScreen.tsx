@@ -3,11 +3,13 @@ import { View, Text, TextInput, KeyboardAvoidingView, Platform, ScrollView, Touc
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { CustomButton } from '../../components/CustomButton/CustomButton';
+import { ContactPickerModal } from '../../components/ContactPickerModal/ContactPickerModal';
 import { taskService } from '../../services/taskService';
 import { notificationService } from '../../services/notificationService';
 import { styles } from './style';
 
 import { NavigationProp, AddTaskRouteProp } from './types';
+import { AssignedContact } from '../../types';
 import { COLORS } from '../../constants/theme';
 
 export const AddTaskScreen = () => {
@@ -15,6 +17,9 @@ export const AddTaskScreen = () => {
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  
+  const [assignedContact, setAssignedContact] = useState<AssignedContact | null>(null);
+  const [showContactPicker, setShowContactPicker] = useState(false);
   
   const [reminderType, setReminderType] = useState<'hoy' | 'otro_dia'>('hoy');
   const [hours, setHours] = useState('0');
@@ -29,7 +34,7 @@ export const AddTaskScreen = () => {
   const route = useRoute<AddTaskRouteProp>();
   const taskId = route.params?.taskId;
 
-  const { container, header, backButton, backButtonText, headerTitle, placeholder, formContainer, titleInput, descriptionInput, reminderInfo, reminderText, pickerRow, dateBtn, dateBtnText, footer, footerBtn, radioContainer, radioOption, radioCircle, radioInner, radioText, durationContainer, durationInputGroup, durationInput, durationLabel } = styles;
+  const { container, header, backButton, backButtonText, headerTitle, placeholder, formContainer, titleInput, descriptionInput, reminderInfo, reminderText, pickerRow, dateBtn, dateBtnText, footer, footerBtn, radioContainer, radioOption, radioCircle, radioInner, radioText, durationContainer, durationInputGroup, durationInput, durationLabel, contactSection, contactSelectBtn, contactSelectBtnText, contactChip, contactChipInfo, contactChipName, contactChipPhone, removeContactBtn, removeContactBtnText } = styles;
 
   useEffect(() => {
     const loadTask = async () => {
@@ -39,6 +44,9 @@ export const AddTaskScreen = () => {
         if (task) {
           setTitle(task.title);
           setDescription(task.description);
+          if (task.assignedContact) {
+            setAssignedContact(task.assignedContact);
+          }
           
           if (task.reminderConfig && (task.reminderConfig.includes('h') || task.reminderConfig.includes('min') || task.reminderConfig.includes('seg'))) {
             setReminderType('hoy');
@@ -114,6 +122,7 @@ export const AddTaskScreen = () => {
             description,
             reminderTime: finalReminderTime.toISOString(),
             reminderConfig: finalReminderConfig,
+            assignedContact: assignedContact ?? undefined,
           };
           await taskService.updateTask(updatedTask);
           await notificationService.scheduleTaskReminder(updatedTask, finalReminderTime);
@@ -125,6 +134,7 @@ export const AddTaskScreen = () => {
           reminderTime: finalReminderTime.toISOString(),
           reminderConfig: finalReminderConfig,
           completed: false,
+          assignedContact: assignedContact ?? undefined,
         });
         await notificationService.scheduleTaskReminder(newTask, finalReminderTime);
       }
@@ -190,6 +200,35 @@ export const AddTaskScreen = () => {
           multiline
           textAlignVertical="top"
         />
+
+        <View style={contactSection}>
+          <Text style={reminderText}>👤 Responsable:</Text>
+          {assignedContact ? (
+            <View style={contactChip}>
+              <View style={contactChipInfo}>
+                <Text style={contactChipName}>{assignedContact.name}</Text>
+                {assignedContact.phoneNumber && (
+                  <Text style={contactChipPhone}>{assignedContact.phoneNumber}</Text>
+                )}
+              </View>
+              <TouchableOpacity
+                style={removeContactBtn}
+                onPress={() => setAssignedContact(null)}
+                activeOpacity={0.7}
+              >
+                <Text style={removeContactBtnText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={contactSelectBtn}
+              onPress={() => setShowContactPicker(true)}
+              activeOpacity={0.7}
+            >
+              <Text style={contactSelectBtnText}>Seleccionar Responsable</Text>
+            </TouchableOpacity>
+          )}
+        </View>
 
           <View style={reminderInfo}>
              <Text style={reminderText}>🔔 Configurar Recordatorio:</Text>
@@ -273,6 +312,15 @@ export const AddTaskScreen = () => {
           style={footerBtn}
         />
       </View>
+
+      <ContactPickerModal
+        visible={showContactPicker}
+        onClose={() => setShowContactPicker(false)}
+        onSelect={(contact) => {
+          setAssignedContact(contact);
+          setShowContactPicker(false);
+        }}
+      />
     </KeyboardAvoidingView>
   );
 };

@@ -1,3 +1,9 @@
+export interface AssignedContact {
+  id: string;
+  name: string;
+  phoneNumber?: string;
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -5,6 +11,7 @@ export interface Task {
   reminderTime: string;
   reminderConfig?: string;
   completed: boolean;
+  assignedContact?: AssignedContact;
 }
 
 export interface User {

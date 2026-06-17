@@ -151,5 +151,59 @@ export const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     ...FONTS.caption,
     marginLeft: 2,
-  }
+  },
+  contactSection: {
+    backgroundColor: COLORS.surface,
+    padding: SPACING.md,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.accentMuted,
+    marginBottom: SPACING.lg,
+  },
+  contactSelectBtn: {
+    backgroundColor: COLORS.background,
+    padding: SPACING.md,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.accentMuted,
+    alignItems: 'center',
+    borderStyle: 'dashed',
+  },
+  contactSelectBtnText: {
+    color: COLORS.accent,
+    ...FONTS.body,
+    fontWeight: '600',
+  },
+  contactChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.background,
+    padding: SPACING.sm,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.accent,
+  },
+  contactChipInfo: {
+    flex: 1,
+    marginLeft: SPACING.xs,
+  },
+  contactChipName: {
+    ...FONTS.body,
+    color: COLORS.textPrimary,
+    fontWeight: '600',
+  },
+  contactChipPhone: {
+    ...FONTS.caption,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+  removeContactBtn: {
+    padding: SPACING.xs,
+    marginLeft: SPACING.sm,
+  },
+  removeContactBtnText: {
+    color: COLORS.danger,
+    fontSize: 16,
+    fontWeight: '700',
+  },
 });

@@ -52,6 +52,11 @@ export const styles = StyleSheet.create({
     ...FONTS.body,
     color: COLORS.textSecondary,
   },
+  assignedText: {
+    ...FONTS.caption,
+    color: COLORS.accent,
+    marginTop: 4,
+  },
   actionsContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
