@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { CustomButton } from '../../components/CustomButton/CustomButton';
@@ -20,6 +21,7 @@ export const AddTaskScreen = () => {
   
   const [assignedContact, setAssignedContact] = useState<AssignedContact | null>(null);
   const [showContactPicker, setShowContactPicker] = useState(false);
+  const [imageUri, setImageUri] = useState<string | null>(null);
   
   const [reminderType, setReminderType] = useState<'hoy' | 'otro_dia'>('hoy');
   const [hours, setHours] = useState('0');
@@ -34,7 +36,7 @@ export const AddTaskScreen = () => {
   const route = useRoute<AddTaskRouteProp>();
   const taskId = route.params?.taskId;
 
-  const { container, header, backButton, backButtonText, headerTitle, placeholder, formContainer, titleInput, descriptionInput, reminderInfo, reminderText, pickerRow, dateBtn, dateBtnText, footer, footerBtn, radioContainer, radioOption, radioCircle, radioInner, radioText, durationContainer, durationInputGroup, durationInput, durationLabel, contactSection, contactSelectBtn, contactSelectBtnText, contactChip, contactChipInfo, contactChipName, contactChipPhone, removeContactBtn, removeContactBtnText } = styles;
+  const { container, header, backButton, backButtonText, headerTitle, placeholder, formContainer, titleInput, descriptionInput, reminderInfo, reminderText, pickerRow, dateBtn, dateBtnText, footer, footerBtn, radioContainer, radioOption, radioCircle, radioInner, radioText, durationContainer, durationInputGroup, durationInput, durationLabel, contactSection, contactSelectBtn, contactSelectBtnText, contactChip, contactChipInfo, contactChipName, contactChipPhone, removeContactBtn, removeContactBtnText, imageSection, imageBtnRow, imageBtn, imageBtnText, imagePreviewContainer, imagePreview, removeImageBtn, removeImageBtnText, imageHint } = styles;
 
   useEffect(() => {
     const loadTask = async () => {
@@ -46,6 +48,9 @@ export const AddTaskScreen = () => {
           setDescription(task.description);
           if (task.assignedContact) {
             setAssignedContact(task.assignedContact);
+          }
+          if (task.imageUri) {
+            setImageUri(task.imageUri);
           }
           
           if (task.reminderConfig && (task.reminderConfig.includes('h') || task.reminderConfig.includes('min') || task.reminderConfig.includes('seg'))) {
@@ -72,6 +77,66 @@ export const AddTaskScreen = () => {
     
     notificationService.registerForPushNotifications();
   }, [taskId]);
+
+  const launchCamera = async () => {
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permiso denegado', 'Se necesita acceso a la cámara para tomar una foto.');
+        return;
+      }
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        quality: 0.7,
+      });
+      if (!result.canceled && result.assets.length > 0) {
+        setImageUri(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Error al tomar foto:', error);
+      Alert.alert('Error', 'No se pudo acceder a la cámara.');
+    }
+  };
+
+  const launchGallery = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permiso denegado', 'Se necesita acceso a la galería para seleccionar una imagen.');
+        return;
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        quality: 0.7,
+      });
+      if (!result.canceled && result.assets.length > 0) {
+        setImageUri(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Error al seleccionar imagen:', error);
+      Alert.alert('Error', 'No se pudo acceder a la galería.');
+    }
+  };
+
+  const confirmAndRun = (action: () => Promise<void>) => {
+    if (imageUri) {
+      Alert.alert(
+        'Reemplazar imagen',
+        'Ya tenés una imagen adjunta. ¿Querés reemplazarla?',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          { text: 'Reemplazar', style: 'destructive', onPress: () => action() },
+        ]
+      );
+    } else {
+      action();
+    }
+  };
+
+  const handleTakePhoto = () => confirmAndRun(launchCamera);
+  const handlePickFromGallery = () => confirmAndRun(launchGallery);
 
   const handleSave = async () => {
     if (!title.trim()) return;
@@ -123,6 +188,7 @@ export const AddTaskScreen = () => {
             reminderTime: finalReminderTime.toISOString(),
             reminderConfig: finalReminderConfig,
             assignedContact: assignedContact ?? undefined,
+            imageUri: imageUri ?? undefined,
           };
           await taskService.updateTask(updatedTask);
           await notificationService.scheduleTaskReminder(updatedTask, finalReminderTime);
@@ -135,6 +201,7 @@ export const AddTaskScreen = () => {
           reminderConfig: finalReminderConfig,
           completed: false,
           assignedContact: assignedContact ?? undefined,
+          imageUri: imageUri ?? undefined,
         });
         await notificationService.scheduleTaskReminder(newTask, finalReminderTime);
       }
@@ -200,6 +267,31 @@ export const AddTaskScreen = () => {
           multiline
           textAlignVertical="top"
         />
+
+        <View style={imageSection}>
+          <Text style={reminderText}>📷 Imagen adjunta:</Text>
+          <Text style={imageHint}>Solo se permite una imagen por tarea.</Text>
+          <View style={imageBtnRow}>
+            <TouchableOpacity style={imageBtn} onPress={handleTakePhoto} activeOpacity={0.7}>
+              <Text style={imageBtnText}>📸 Tomar Foto</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={imageBtn} onPress={handlePickFromGallery} activeOpacity={0.7}>
+              <Text style={imageBtnText}>🖼️ Galería</Text>
+            </TouchableOpacity>
+          </View>
+          {imageUri && (
+            <View style={imagePreviewContainer}>
+              <Image source={{ uri: imageUri }} style={imagePreview} />
+              <TouchableOpacity
+                style={removeImageBtn}
+                onPress={() => setImageUri(null)}
+                activeOpacity={0.7}
+              >
+                <Text style={removeImageBtnText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
 
         <View style={contactSection}>
           <Text style={reminderText}>👤 Responsable:</Text>

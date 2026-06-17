@@ -75,5 +75,12 @@ export const styles = StyleSheet.create({
   actionIcon: {
     fontSize: 16,
     color: COLORS.textPrimary,
-  }
+  },
+  taskImage: {
+    width: '100%',
+    height: 60,
+    borderRadius: 6,
+    marginTop: 6,
+    resizeMode: 'cover',
+  },
 });

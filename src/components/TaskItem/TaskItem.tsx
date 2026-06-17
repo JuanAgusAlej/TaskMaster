@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { CustomButton } from '../CustomButton/CustomButton';
 import { styles } from './style';
 import { TaskItemProps } from './types';
@@ -13,7 +13,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
 }) => {
   const [showActions, setShowActions] = useState(false);
 
-  const {container, checkboxContainer, checkbox, checkboxChecked, checkmark, textContainer, title, titleCompleted, body, assignedText, actionsContainer, actionBtn, deleteBtn, actionIcon, mainContent} = styles
+  const {container, checkboxContainer, checkbox, checkboxChecked, checkmark, textContainer, title, titleCompleted, body, assignedText, actionsContainer, actionBtn, deleteBtn, actionIcon, mainContent, taskImage} = styles
 
   return (
     <View style={container}>
@@ -49,6 +49,9 @@ export const TaskItem: React.FC<TaskItemProps> = ({
           </Text>
           {task.assignedContact && (
             <Text style={assignedText} numberOfLines={1}>👤 {task.assignedContact.name}</Text>
+          )}
+          {task.imageUri && (
+            <Image source={{ uri: task.imageUri }} style={taskImage} />
           )}
         </TouchableOpacity>
 
