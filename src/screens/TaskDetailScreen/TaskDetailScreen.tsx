@@ -81,6 +81,16 @@ export const TaskDetailScreen = () => {
           </Text>
         </View>
 
+        {task.assignedContact && (
+          <View style={infoBox}>
+            <Text style={infoTitle}>👤 Responsable:</Text>
+            <Text style={infoText}>{task.assignedContact.name}</Text>
+            {task.assignedContact.phoneNumber && (
+              <Text style={infoText}>📞 {task.assignedContact.phoneNumber}</Text>
+            )}
+          </View>
+        )}
+
         <View style={statusBox}>
            <Text style={statusTitle}>Estado:</Text>
            {fromTab === 'completed' ? (

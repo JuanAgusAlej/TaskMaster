@@ -7,7 +7,7 @@ Este proyecto fue desarrollado como parte de una entrega académica para la mate
 ## 🎥 Demo y Descarga
 ¿Querés ver cómo funciona la aplicación en acción o probarla en tu dispositivo Android?
 - [Ver Demo en YouTube](https://www.youtube.com/shorts/WoTBJ5KoH1Q)
-- [Descargar APK (Google Drive)](https://drive.google.com/file/d/1GRgzXuatsc8JMsYADYxRoPiHMfr28FcY/view)
+- [Descargar APK (Google Drive)](https://drive.google.com/file/d/1Rejfa1c72vQmo-_kBQ0tVXfous53hHqh/view?usp=sharing)
 
 ## ✨ Características Principales
 
