@@ -50,6 +50,9 @@ export const TaskItem: React.FC<TaskItemProps> = ({
           {task.assignedContact && (
             <Text style={assignedText} numberOfLines={1}>👤 {task.assignedContact.name}</Text>
           )}
+          {task.location && (
+            <Text style={assignedText} numberOfLines={1}>📍 {task.location.address || 'Ubicación adjunta'}</Text>
+          )}
           {task.imageUri && (
             <Image source={{ uri: task.imageUri }} style={taskImage} />
           )}

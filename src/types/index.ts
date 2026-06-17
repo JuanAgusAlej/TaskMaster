@@ -4,6 +4,12 @@ export interface AssignedContact {
   phoneNumber?: string;
 }
 
+export interface LocationData {
+  latitude: number;
+  longitude: number;
+  address?: string;
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -13,6 +19,7 @@ export interface Task {
   completed: boolean;
   assignedContact?: AssignedContact;
   imageUri?: string;
+  location?: LocationData;
 }
 
 export interface User {

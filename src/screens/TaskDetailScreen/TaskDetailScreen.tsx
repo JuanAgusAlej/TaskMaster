@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, ActivityIndicator, Image } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
 import { useNavigation, useRoute} from '@react-navigation/native';
 import { CustomButton } from '../../components/CustomButton/CustomButton';
 import { taskService } from '../../services/taskService';
@@ -17,7 +18,7 @@ export const TaskDetailScreen = () => {
   const route = useRoute<TaskDetailRouteProp>();
   const { taskId, fromTab } = route.params;
 
-  const { centerContainer, errorText, container, header, backButton, backButtonText, content, title, divider, description, infoBox, infoTitle, infoText, statusBox, statusTitle, completedStaticBox, statusIcon, completedStaticText, statusBtn, detailImage } = styles;
+  const { centerContainer, errorText, container, header, backButton, backButtonText, content, title, divider, description, infoBox, infoTitle, infoText, statusBox, statusTitle, completedStaticBox, statusIcon, completedStaticText, statusBtn, detailImage, mapContainer, map, locationAddress } = styles;
 
   useEffect(() => {
     const loadTask = async () => {
@@ -88,6 +89,35 @@ export const TaskDetailScreen = () => {
             {task.assignedContact.phoneNumber && (
               <Text style={infoText}>📞 {task.assignedContact.phoneNumber}</Text>
             )}
+          </View>
+        )}
+
+        {task.location && (
+          <View style={infoBox}>
+            <Text style={infoTitle}>📍 Ubicación:</Text>
+            {task.location.address ? (
+              <Text style={locationAddress}>{task.location.address}</Text>
+            ) : null}
+            <View style={mapContainer}>
+              <MapView
+                style={map}
+                initialRegion={{
+                  latitude: task.location.latitude,
+                  longitude: task.location.longitude,
+                  latitudeDelta: 0.00922,
+                  longitudeDelta: 0.00421,
+                }}
+              >
+                <Marker
+                  coordinate={{
+                    latitude: task.location.latitude,
+                    longitude: task.location.longitude,
+                  }}
+                  title={task.title}
+                  description={task.location.address || 'Ubicación'}
+                />
+              </MapView>
+            </View>
           </View>
         )}
 
