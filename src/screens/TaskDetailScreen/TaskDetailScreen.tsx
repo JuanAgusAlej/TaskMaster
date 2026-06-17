@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, Image } from 'react-native';
 import { useNavigation, useRoute} from '@react-navigation/native';
 import { CustomButton } from '../../components/CustomButton/CustomButton';
 import { taskService } from '../../services/taskService';
@@ -17,7 +17,7 @@ export const TaskDetailScreen = () => {
   const route = useRoute<TaskDetailRouteProp>();
   const { taskId, fromTab } = route.params;
 
-  const { centerContainer, errorText, container, header, backButton, backButtonText, content, title, divider, description, infoBox, infoTitle, infoText, statusBox, statusTitle, completedStaticBox, statusIcon, completedStaticText, statusBtn } = styles;
+  const { centerContainer, errorText, container, header, backButton, backButtonText, content, title, divider, description, infoBox, infoTitle, infoText, statusBox, statusTitle, completedStaticBox, statusIcon, completedStaticText, statusBtn, detailImage } = styles;
 
   useEffect(() => {
     const loadTask = async () => {
@@ -88,6 +88,12 @@ export const TaskDetailScreen = () => {
             {task.assignedContact.phoneNumber && (
               <Text style={infoText}>📞 {task.assignedContact.phoneNumber}</Text>
             )}
+          </View>
+        )}
+
+        {task.imageUri && (
+          <View style={infoBox}>
+            <Text style={infoTitle}>📷 Imagen adjunta</Text>
           </View>
         )}
 

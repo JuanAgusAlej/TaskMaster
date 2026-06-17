@@ -12,6 +12,7 @@ export interface Task {
   reminderConfig?: string;
   completed: boolean;
   assignedContact?: AssignedContact;
+  imageUri?: string;
 }
 
 export interface User {

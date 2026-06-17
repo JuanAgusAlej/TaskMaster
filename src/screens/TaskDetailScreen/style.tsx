@@ -98,5 +98,12 @@ export const styles = StyleSheet.create({
     ...FONTS.title,
     fontSize: 16,
     marginLeft: SPACING.sm,
-  }
+  },
+  detailImage: {
+    width: '100%',
+    height: 250,
+    borderRadius: 8,
+    marginTop: SPACING.sm,
+    resizeMode: 'cover',
+  },
 });
