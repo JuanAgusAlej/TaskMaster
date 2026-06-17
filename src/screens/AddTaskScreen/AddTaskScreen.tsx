@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
+import { View, Text, TextInput, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, Alert, Image, Switch } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -8,6 +8,7 @@ import { ContactPickerModal } from '../../components/ContactPickerModal/ContactP
 import { LocationPickerModal } from '../../components/LocationPickerModal/LocationPickerModal';
 import { taskService } from '../../services/taskService';
 import { notificationService } from '../../services/notificationService';
+import { calendarService } from '../../services/calendarService';
 import { styles } from './style';
 
 import { NavigationProp, AddTaskRouteProp } from './types';
@@ -189,9 +190,45 @@ export const AddTaskScreen = () => {
 
     setLoading(true);
     try {
+      // Construir título y notas enriquecidas para el evento de calendario
+      const calendarTitle = `TaskMaster - ${title}`;
+      const notesParts: string[] = [];
+      if (description) notesParts.push(`📝 ${description}`);
+      if (assignedContact) {
+        let contactLine = `👤 Responsable: ${assignedContact.name}`;
+        if (assignedContact.phoneNumber) contactLine += ` (${assignedContact.phoneNumber})`;
+        notesParts.push(contactLine);
+      }
+      if (location) {
+        const locationLine = location.address
+          ? `📍 Ubicación: ${location.address}`
+          : `📍 Ubicación: Lat ${location.latitude.toFixed(4)}, Lng ${location.longitude.toFixed(4)}`;
+        notesParts.push(locationLine);
+      }
+      const calendarNotes = notesParts.join('\n');
+
       if (isEditMode && taskId) {
         const existingTask = await taskService.getTaskById(taskId);
         if (existingTask) {
+          let eventId = existingTask.calendarEventId;
+          try {
+            if (reminderType === 'otro_dia') {
+              if (eventId) {
+                await calendarService.updateEvent(eventId, calendarTitle, finalReminderTime.toISOString(), calendarNotes);
+              } else {
+                const newEventId = await calendarService.createEvent(calendarTitle, finalReminderTime.toISOString(), calendarNotes);
+                if (newEventId) eventId = newEventId;
+              }
+            } else {
+              if (eventId) {
+                await calendarService.deleteEvent(eventId);
+                eventId = undefined;
+              }
+            }
+          } catch (calErr) {
+            console.error('Error syncing with native calendar:', calErr);
+          }
+
           const updatedTask = {
             ...existingTask,
             title,
@@ -201,11 +238,24 @@ export const AddTaskScreen = () => {
             assignedContact: assignedContact ?? undefined,
             imageUri: imageUri ?? undefined,
             location: location ?? undefined,
+            calendarEventId: eventId,
           };
           await taskService.updateTask(updatedTask);
           await notificationService.scheduleTaskReminder(updatedTask, finalReminderTime);
         }
       } else {
+        let eventId: string | undefined = undefined;
+        if (reminderType === 'otro_dia') {
+          try {
+            const newEventId = await calendarService.createEvent(calendarTitle, finalReminderTime.toISOString(), calendarNotes);
+            if (newEventId) {
+              eventId = newEventId;
+            }
+          } catch (calErr) {
+            console.error('Error creating event in native calendar:', calErr);
+          }
+        }
+
         const newTask = await taskService.addTask({
           title,
           description,
@@ -215,6 +265,7 @@ export const AddTaskScreen = () => {
           assignedContact: assignedContact ?? undefined,
           imageUri: imageUri ?? undefined,
           location: location ?? undefined,
+          calendarEventId: eventId,
         });
         await notificationService.scheduleTaskReminder(newTask, finalReminderTime);
       }

@@ -3,6 +3,7 @@ import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import { Task } from '../types';
 import { authService } from './authService';
+import { calendarService } from './calendarService';
 
 const getTasksKey = async () => {
   const username = await authService.getCurrentUser();
@@ -68,6 +69,14 @@ export const taskService = {
     try {
       const key = await getTasksKey();
       const tasks = await this.getTasks();
+      const taskToDelete = tasks.find(t => t.id === id);
+      if (taskToDelete && taskToDelete.calendarEventId) {
+        try {
+          await calendarService.deleteEvent(taskToDelete.calendarEventId);
+        } catch (calErr) {
+          console.error('Error deleting calendar event during task deletion:', calErr);
+        }
+      }
       const filteredTasks = tasks.filter(t => t.id !== id);
       await AsyncStorage.setItem(key, JSON.stringify(filteredTasks));
     } catch (error) {

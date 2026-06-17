@@ -53,6 +53,9 @@ export const TaskItem: React.FC<TaskItemProps> = ({
           {task.location && (
             <Text style={assignedText} numberOfLines={1}>📍 {task.location.address || 'Ubicación adjunta'}</Text>
           )}
+          {task.calendarEventId && (
+            <Text style={assignedText} numberOfLines={1}>📅 Agendado en Calendario</Text>
+          )}
           {task.imageUri && (
             <Image source={{ uri: task.imageUri }} style={taskImage} />
           )}
