@@ -106,4 +106,20 @@ export const styles = StyleSheet.create({
     marginTop: SPACING.sm,
     resizeMode: 'cover',
   },
+  mapContainer: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginTop: SPACING.sm,
+  },
+  map: {
+    width: '100%',
+    height: '100%',
+  },
+  locationAddress: {
+    ...FONTS.body,
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.xs,
+  },
 });

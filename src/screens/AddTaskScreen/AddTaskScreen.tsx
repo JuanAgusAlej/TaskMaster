@@ -5,12 +5,13 @@ import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/dat
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { CustomButton } from '../../components/CustomButton/CustomButton';
 import { ContactPickerModal } from '../../components/ContactPickerModal/ContactPickerModal';
+import { LocationPickerModal } from '../../components/LocationPickerModal/LocationPickerModal';
 import { taskService } from '../../services/taskService';
 import { notificationService } from '../../services/notificationService';
 import { styles } from './style';
 
 import { NavigationProp, AddTaskRouteProp } from './types';
-import { AssignedContact } from '../../types';
+import { AssignedContact, LocationData } from '../../types';
 import { COLORS } from '../../constants/theme';
 
 export const AddTaskScreen = () => {
@@ -22,6 +23,9 @@ export const AddTaskScreen = () => {
   const [assignedContact, setAssignedContact] = useState<AssignedContact | null>(null);
   const [showContactPicker, setShowContactPicker] = useState(false);
   const [imageUri, setImageUri] = useState<string | null>(null);
+  
+  const [location, setLocation] = useState<LocationData | null>(null);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
   
   const [reminderType, setReminderType] = useState<'hoy' | 'otro_dia'>('hoy');
   const [hours, setHours] = useState('0');
@@ -36,7 +40,7 @@ export const AddTaskScreen = () => {
   const route = useRoute<AddTaskRouteProp>();
   const taskId = route.params?.taskId;
 
-  const { container, header, backButton, backButtonText, headerTitle, placeholder, formContainer, titleInput, descriptionInput, reminderInfo, reminderText, pickerRow, dateBtn, dateBtnText, footer, footerBtn, radioContainer, radioOption, radioCircle, radioInner, radioText, durationContainer, durationInputGroup, durationInput, durationLabel, contactSection, contactSelectBtn, contactSelectBtnText, contactChip, contactChipInfo, contactChipName, contactChipPhone, removeContactBtn, removeContactBtnText, imageSection, imageBtnRow, imageBtn, imageBtnText, imagePreviewContainer, imagePreview, removeImageBtn, removeImageBtnText, imageHint } = styles;
+  const { container, header, backButton, backButtonText, headerTitle, placeholder, formContainer, titleInput, descriptionInput, reminderInfo, reminderText, pickerRow, dateBtn, dateBtnText, footer, footerBtn, radioContainer, radioOption, radioCircle, radioInner, radioText, durationContainer, durationInputGroup, durationInput, durationLabel, contactSection, contactSelectBtn, contactSelectBtnText, contactChip, contactChipInfo, contactChipName, contactChipPhone, removeContactBtn, removeContactBtnText, imageSection, imageBtnRow, imageBtn, imageBtnText, imagePreviewContainer, imagePreview, removeImageBtn, removeImageBtnText, imageHint, locationSection, locationBtn, locationBtnText, locationChip, locationChipText, removeLocationBtn, removeLocationBtnText } = styles;
 
   useEffect(() => {
     const loadTask = async () => {
@@ -51,6 +55,9 @@ export const AddTaskScreen = () => {
           }
           if (task.imageUri) {
             setImageUri(task.imageUri);
+          }
+          if (task.location) {
+            setLocation(task.location);
           }
           
           if (task.reminderConfig && (task.reminderConfig.includes('h') || task.reminderConfig.includes('min') || task.reminderConfig.includes('seg'))) {
@@ -138,6 +145,10 @@ export const AddTaskScreen = () => {
   const handleTakePhoto = () => confirmAndRun(launchCamera);
   const handlePickFromGallery = () => confirmAndRun(launchGallery);
 
+  const handleOpenLocationPicker = () => {
+    setShowLocationPicker(true);
+  };
+
   const handleSave = async () => {
     if (!title.trim()) return;
 
@@ -189,6 +200,7 @@ export const AddTaskScreen = () => {
             reminderConfig: finalReminderConfig,
             assignedContact: assignedContact ?? undefined,
             imageUri: imageUri ?? undefined,
+            location: location ?? undefined,
           };
           await taskService.updateTask(updatedTask);
           await notificationService.scheduleTaskReminder(updatedTask, finalReminderTime);
@@ -202,6 +214,7 @@ export const AddTaskScreen = () => {
           completed: false,
           assignedContact: assignedContact ?? undefined,
           imageUri: imageUri ?? undefined,
+          location: location ?? undefined,
         });
         await notificationService.scheduleTaskReminder(newTask, finalReminderTime);
       }
@@ -290,6 +303,39 @@ export const AddTaskScreen = () => {
                 <Text style={removeImageBtnText}>✕</Text>
               </TouchableOpacity>
             </View>
+          )}
+        </View>
+
+        <View style={locationSection}>
+          <Text style={reminderText}>📍 Ubicación:</Text>
+          {location ? (
+            <TouchableOpacity 
+              style={locationChip} 
+              onPress={handleOpenLocationPicker}
+              activeOpacity={0.7}
+            >
+              <Text style={locationChipText} numberOfLines={2}>
+                {location.address || `Lat: ${location.latitude.toFixed(4)}, Lng: ${location.longitude.toFixed(4)}`}
+              </Text>
+              <TouchableOpacity
+                style={removeLocationBtn}
+                onPress={(e) => {
+                  e.stopPropagation();
+                  setLocation(null);
+                }}
+                activeOpacity={0.7}
+              >
+                <Text style={removeLocationBtnText}>✕</Text>
+              </TouchableOpacity>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={locationBtn}
+              onPress={handleOpenLocationPicker}
+              activeOpacity={0.7}
+            >
+              <Text style={locationBtnText}>Seleccionar Ubicación</Text>
+            </TouchableOpacity>
           )}
         </View>
 
@@ -411,6 +457,16 @@ export const AddTaskScreen = () => {
         onSelect={(contact) => {
           setAssignedContact(contact);
           setShowContactPicker(false);
+        }}
+      />
+
+      <LocationPickerModal
+        visible={showLocationPicker}
+        onClose={() => setShowLocationPicker(false)}
+        initialLocation={location}
+        onSelect={(loc) => {
+          setLocation(loc);
+          setShowLocationPicker(false);
         }}
       />
     </KeyboardAvoidingView>
