@@ -15,6 +15,7 @@ import { styles } from './style';
 import { NavigationProp, AddTaskRouteProp } from './types';
 import { AssignedContact, LocationData } from '../../types';
 import { COLORS } from '../../constants/theme';
+import { Ionicons } from '@expo/vector-icons';
 
 export const AddTaskScreen = () => {
   const [title, setTitle] = useState('');
@@ -47,7 +48,9 @@ export const AddTaskScreen = () => {
     taskId ? s.tasks.items.find(t => t.id === taskId) ?? null : null
   );
 
-  const { container, header, backButton, backButtonText, headerTitle, placeholder, formContainer, titleInput, descriptionInput, reminderInfo, reminderText, pickerRow, dateBtn, dateBtnText, footer, footerBtn, radioContainer, radioOption, radioCircle, radioInner, radioText, durationContainer, durationInputGroup, durationInput, durationLabel, contactSection, contactSelectBtn, contactSelectBtnText, contactChip, contactChipInfo, contactChipName, contactChipPhone, removeContactBtn, removeContactBtnText, imageSection, imageBtnRow, imageBtn, imageBtnText, imagePreviewContainer, imagePreview, removeImageBtn, removeImageBtnText, imageHint, locationSection, locationBtn, locationBtnText, locationChip, locationChipText, removeLocationBtn, removeLocationBtnText } = styles;
+  const { container, header, backButton, backButtonText, headerTitle, placeholder, formContainer, titleInput, descriptionInput, reminderInfo, reminderText, pickerRow, dateBtn, dateBtnText, footer, footerBtn, radioContainer, radioOption, radioCircle, radioInner, radioText, durationContainer, durationInputGroup, durationInput, durationLabel, contactSection, contactSelectBtn, contactSelectBtnText, contactChip, contactChipInfo, contactChipName, contactChipPhone, removeContactBtn, removeContactBtnText, imageSection, imageBtnRow, imageBtn, imageBtnText, imagePreviewContainer, imagePreview, removeImageBtn, removeImageBtnText, imageHint, locationSection, locationBtn, locationBtnText, locationChip, locationChipText, removeLocationBtn, removeLocationBtnText, fieldLabel, fieldLabelText, requiredAsterisk } = styles;
+
+  const isFormValid = title.trim().length > 0 && description.trim().length > 0;
 
   useEffect(() => {
     if (taskId && existingTask) {
@@ -300,17 +303,20 @@ export const AddTaskScreen = () => {
     >
       <View style={header}>
         <CustomButton
-           title="← Volver"
            onPress={() => navigation.goBack()}
-           variant="outline"
+           variant="icon"
            style={backButton}
-           textStyle={backButtonText}
+            icon={<Ionicons name="arrow-back" size={24} color={COLORS.accent} />}
         />
         <Text style={headerTitle}>{isEditMode ? 'Editar Tarea' : 'Nueva Tarea'}</Text>
         <View style={placeholder} />
       </View>
 
       <ScrollView contentContainerStyle={formContainer}>
+        <View style={fieldLabel}>
+          <Text style={fieldLabelText}>Título</Text>
+          <Text style={requiredAsterisk}>*</Text>
+        </View>
         <TextInput
           style={titleInput}
           placeholder="Título..."
@@ -319,6 +325,10 @@ export const AddTaskScreen = () => {
           onChangeText={setTitle}
         />
         
+        <View style={fieldLabel}>
+          <Text style={fieldLabelText}>Descripción</Text>
+          <Text style={requiredAsterisk}>*</Text>
+        </View>
         <TextInput
           style={descriptionInput}
           placeholder="Descripción..."
@@ -495,6 +505,7 @@ export const AddTaskScreen = () => {
           title="Guardar"
           onPress={handleSave}
           loading={loading}
+          disabled={!isFormValid}
           style={footerBtn}
         />
       </View>
