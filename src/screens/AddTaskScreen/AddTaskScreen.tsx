@@ -6,7 +6,8 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { CustomButton } from '../../components/CustomButton/CustomButton';
 import { ContactPickerModal } from '../../components/ContactPickerModal/ContactPickerModal';
 import { LocationPickerModal } from '../../components/LocationPickerModal/LocationPickerModal';
-import { taskService } from '../../services/taskService';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { addTaskAsync, updateTaskAsync } from '../../store/taskSlice';
 import { notificationService } from '../../services/notificationService';
 import { calendarService } from '../../services/calendarService';
 import { styles } from './style';
@@ -41,50 +42,49 @@ export const AddTaskScreen = () => {
   const route = useRoute<AddTaskRouteProp>();
   const taskId = route.params?.taskId;
 
+  const dispatch = useAppDispatch();
+  const existingTask = useAppSelector(s =>
+    taskId ? s.tasks.items.find(t => t.id === taskId) ?? null : null
+  );
+
   const { container, header, backButton, backButtonText, headerTitle, placeholder, formContainer, titleInput, descriptionInput, reminderInfo, reminderText, pickerRow, dateBtn, dateBtnText, footer, footerBtn, radioContainer, radioOption, radioCircle, radioInner, radioText, durationContainer, durationInputGroup, durationInput, durationLabel, contactSection, contactSelectBtn, contactSelectBtnText, contactChip, contactChipInfo, contactChipName, contactChipPhone, removeContactBtn, removeContactBtnText, imageSection, imageBtnRow, imageBtn, imageBtnText, imagePreviewContainer, imagePreview, removeImageBtn, removeImageBtnText, imageHint, locationSection, locationBtn, locationBtnText, locationChip, locationChipText, removeLocationBtn, removeLocationBtnText } = styles;
 
   useEffect(() => {
-    const loadTask = async () => {
-      if (taskId) {
-        setIsEditMode(true);
-        const task = await taskService.getTaskById(taskId);
-        if (task) {
-          setTitle(task.title);
-          setDescription(task.description);
-          if (task.assignedContact) {
-            setAssignedContact(task.assignedContact);
-          }
-          if (task.imageUri) {
-            setImageUri(task.imageUri);
-          }
-          if (task.location) {
-            setLocation(task.location);
-          }
-          
-          if (task.reminderConfig && (task.reminderConfig.includes('h') || task.reminderConfig.includes('min') || task.reminderConfig.includes('seg'))) {
-            setReminderType('hoy');
-            const remaining = new Date(task.reminderTime).getTime() - Date.now();
-            if (remaining > 0) {
-              const h = Math.floor(remaining / 3600000);
-              const m = Math.floor((remaining % 3600000) / 60000);
-              const s = Math.floor((remaining % 60000) / 1000);
-              setHours(h.toString());
-              setMinutes(m.toString());
-              setSeconds(s.toString());
-            } else {
-              setHours('0'); setMinutes('0'); setSeconds('0');
-            }
-          } else {
-            setReminderType('otro_dia');
-            setReminderDate(new Date(task.reminderTime));
-          }
-        }
+    if (taskId && existingTask) {
+      setIsEditMode(true);
+      setTitle(existingTask.title);
+      setDescription(existingTask.description);
+      if (existingTask.assignedContact) {
+        setAssignedContact(existingTask.assignedContact);
       }
-    };
-    loadTask();
+      if (existingTask.imageUri) {
+        setImageUri(existingTask.imageUri);
+      }
+      if (existingTask.location) {
+        setLocation(existingTask.location);
+      }
+      
+      if (existingTask.reminderConfig && (existingTask.reminderConfig.includes('h') || existingTask.reminderConfig.includes('min') || existingTask.reminderConfig.includes('seg'))) {
+        setReminderType('hoy');
+        const remaining = new Date(existingTask.reminderTime).getTime() - Date.now();
+        if (remaining > 0) {
+          const h = Math.floor(remaining / 3600000);
+          const m = Math.floor((remaining % 3600000) / 60000);
+          const s = Math.floor((remaining % 60000) / 1000);
+          setHours(h.toString());
+          setMinutes(m.toString());
+          setSeconds(s.toString());
+        } else {
+          setHours('0'); setMinutes('0'); setSeconds('0');
+        }
+      } else {
+        setReminderType('otro_dia');
+        setReminderDate(new Date(existingTask.reminderTime));
+      }
+    }
     
     notificationService.registerForPushNotifications();
-  }, [taskId]);
+  }, [taskId, existingTask]);
 
   const launchCamera = async () => {
     try {
@@ -207,42 +207,39 @@ export const AddTaskScreen = () => {
       }
       const calendarNotes = notesParts.join('\n');
 
-      if (isEditMode && taskId) {
-        const existingTask = await taskService.getTaskById(taskId);
-        if (existingTask) {
-          let eventId = existingTask.calendarEventId;
-          try {
-            if (reminderType === 'otro_dia') {
-              if (eventId) {
-                await calendarService.updateEvent(eventId, calendarTitle, finalReminderTime.toISOString(), calendarNotes);
-              } else {
-                const newEventId = await calendarService.createEvent(calendarTitle, finalReminderTime.toISOString(), calendarNotes);
-                if (newEventId) eventId = newEventId;
-              }
+      if (isEditMode && taskId && existingTask) {
+        let eventId = existingTask.calendarEventId;
+        try {
+          if (reminderType === 'otro_dia') {
+            if (eventId) {
+              await calendarService.updateEvent(eventId, calendarTitle, finalReminderTime.toISOString(), calendarNotes);
             } else {
-              if (eventId) {
-                await calendarService.deleteEvent(eventId);
-                eventId = undefined;
-              }
+              const newEventId = await calendarService.createEvent(calendarTitle, finalReminderTime.toISOString(), calendarNotes);
+              if (newEventId) eventId = newEventId;
             }
-          } catch (calErr) {
-            console.error('Error syncing with native calendar:', calErr);
+          } else {
+            if (eventId) {
+              await calendarService.deleteEvent(eventId);
+              eventId = undefined;
+            }
           }
-
-          const updatedTask = {
-            ...existingTask,
-            title,
-            description,
-            reminderTime: finalReminderTime.toISOString(),
-            reminderConfig: finalReminderConfig,
-            assignedContact: assignedContact ?? undefined,
-            imageUri: imageUri ?? undefined,
-            location: location ?? undefined,
-            calendarEventId: eventId,
-          };
-          await taskService.updateTask(updatedTask);
-          await notificationService.scheduleTaskReminder(updatedTask, finalReminderTime);
+        } catch (calErr) {
+          console.error('Error syncing with native calendar:', calErr);
         }
+
+        const updatedTask = {
+          ...existingTask,
+          title,
+          description,
+          reminderTime: finalReminderTime.toISOString(),
+          reminderConfig: finalReminderConfig,
+          assignedContact: assignedContact ?? undefined,
+          imageUri: imageUri ?? undefined,
+          location: location ?? undefined,
+          calendarEventId: eventId,
+        };
+        await dispatch(updateTaskAsync(updatedTask));
+        await notificationService.scheduleTaskReminder(updatedTask, finalReminderTime);
       } else {
         let eventId: string | undefined = undefined;
         if (reminderType === 'otro_dia') {
@@ -256,7 +253,7 @@ export const AddTaskScreen = () => {
           }
         }
 
-        const newTask = await taskService.addTask({
+        const newTask = await dispatch(addTaskAsync({
           title,
           description,
           reminderTime: finalReminderTime.toISOString(),
@@ -266,7 +263,7 @@ export const AddTaskScreen = () => {
           imageUri: imageUri ?? undefined,
           location: location ?? undefined,
           calendarEventId: eventId,
-        });
+        })).unwrap();
         await notificationService.scheduleTaskReminder(newTask, finalReminderTime);
       }
       

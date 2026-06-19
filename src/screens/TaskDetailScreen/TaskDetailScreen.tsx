@@ -1,50 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, Text, ScrollView, ActivityIndicator, Image } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { useNavigation, useRoute} from '@react-navigation/native';
 import { CustomButton } from '../../components/CustomButton/CustomButton';
-import { taskService } from '../../services/taskService';
-import { Task} from '../../types';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { updateTaskAsync } from '../../store/taskSlice';
 import { COLORS } from '../../constants/theme';
 import { styles } from './style';
 
 import { NavigationProp, TaskDetailRouteProp } from './types';
 
 export const TaskDetailScreen = () => {
-  const [task, setTask] = useState<Task | null>(null);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useAppDispatch();
   
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<TaskDetailRouteProp>();
   const { taskId, fromTab } = route.params;
 
+  const task = useAppSelector(s => s.tasks.items.find(t => t.id === taskId) ?? null);
+
   const { centerContainer, errorText, container, header, backButton, backButtonText, content, title, divider, description, infoBox, infoTitle, infoText, statusBox, statusTitle, completedStaticBox, statusIcon, completedStaticText, statusBtn, detailImage, mapContainer, map, locationAddress } = styles;
 
-  useEffect(() => {
-    const loadTask = async () => {
-      setLoading(true);
-      const loadedTask = await taskService.getTaskById(taskId);
-      setTask(loadedTask);
-      setLoading(false);
-    };
-    loadTask();
-  }, [taskId]);
-
-  const handleToggleComplete = async () => {
+  const handleToggleComplete = () => {
     if (!task) return;
     
     const updatedTask = { ...task, completed: !task.completed };
-    await taskService.updateTask(updatedTask);
-    setTask(updatedTask);
+    dispatch(updateTaskAsync(updatedTask));
   };
-
-  if (loading) {
-    return (
-      <View style={centerContainer}>
-        <ActivityIndicator size="large" color={COLORS.accent} />
-      </View>
-    );
-  }
 
   if (!task) {
     return (
@@ -150,3 +132,4 @@ export const TaskDetailScreen = () => {
     </View>
   );
 };
+
