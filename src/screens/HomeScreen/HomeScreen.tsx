@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
-import { View, Text, FlatList } from 'react-native';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { View, Text, FlatList, AppState } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { CustomButton } from '../../components/CustomButton/CustomButton';
@@ -10,6 +10,7 @@ import { ConfirmModal } from '../../components/ConfirmModal/ConfirmModal';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { loadTasks, deleteTaskAsync, updateTaskAsync } from '../../store/taskSlice';
 import { logoutAsync } from '../../store/authSlice';
+import { useAutoCompleteTimerTasks } from '../../hooks/useAutoCompleteTimerTasks';
 import { Task } from '../../types';
 import { COLORS } from '../../constants/theme';
 import { styles } from './style';
@@ -23,6 +24,9 @@ export const HomeScreen = () => {
   const username = useAppSelector(s => s.auth.user) ?? '';
 
   const [activeTab, setActiveTab] = useState<'in_progress' | 'completed'>('in_progress');
+
+  // Auto-completar tareas con temporizador expirado
+  useAutoCompleteTimerTasks();
   const [tabSwitching, setTabSwitching] = useState(false);
   
   const [modalVisible, setModalVisible] = useState(false);
@@ -38,6 +42,22 @@ export const HomeScreen = () => {
       dispatch(loadTasks());
     }, [dispatch])
   );
+
+  // Recargar tareas cuando la app vuelve del segundo plano
+  const appState = useRef(AppState.currentState);
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      if (
+        (appState.current === 'background' || appState.current === 'inactive') &&
+        nextAppState === 'active'
+      ) {
+        dispatch(loadTasks());
+      }
+      appState.current = nextAppState;
+    });
+
+    return () => subscription.remove();
+  }, [dispatch]);
 
   const handleTabChange = (tab: 'in_progress' | 'completed') => {
     setTabSwitching(true);

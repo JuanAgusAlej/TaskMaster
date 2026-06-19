@@ -32,6 +32,7 @@ export const styles = StyleSheet.create({
   formContainer: {
     paddingHorizontal: SPACING.md,
     flexGrow: 1,
+    paddingBottom: SPACING.lg,
   },
   titleInput: {
     backgroundColor: COLORS.surface,
@@ -327,5 +328,21 @@ export const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     ...FONTS.body,
     fontWeight: '600',
+  },
+  fieldLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.xs,
+  },
+  fieldLabelText: {
+    color: COLORS.textSecondary,
+    ...FONTS.body,
+    fontWeight: '600',
+  },
+  requiredAsterisk: {
+    color: COLORS.danger,
+    fontSize: 16,
+    fontWeight: '700',
+    marginLeft: 2,
   },
 });

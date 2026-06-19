@@ -9,6 +9,7 @@ import { COLORS } from '../../constants/theme';
 import { styles } from './style';
 
 import { NavigationProp, TaskDetailRouteProp } from './types';
+import { Ionicons } from '@expo/vector-icons';
 
 export const TaskDetailScreen = () => {
   const dispatch = useAppDispatch();
@@ -41,11 +42,10 @@ export const TaskDetailScreen = () => {
     <View style={container}>
       <View style={header}>
         <CustomButton
-           title="← Volver"
            onPress={() => navigation.goBack()}
-           variant="outline"
+           variant="icon"
            style={backButton}
-           textStyle={backButtonText}
+            icon={<Ionicons name="arrow-back" size={24} color={COLORS.accent} />}
         />
       </View>
 
