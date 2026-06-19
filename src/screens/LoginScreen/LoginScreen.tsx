@@ -3,7 +3,8 @@ import { View, Text, TextInput, KeyboardAvoidingView, Platform, TouchableWithout
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { CustomButton } from '../../components/CustomButton/CustomButton';
-import { authService } from '../../services/authService';
+import { useAppDispatch } from '../../store/hooks';
+import { loginAsync } from '../../store/authSlice';
 import { COLORS } from '../../constants/theme';
 import { styles } from './style';
 
@@ -15,6 +16,7 @@ export const LoginScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation<NavigationProp>();
+  const dispatch = useAppDispatch();
 
   const { container, inner, logoContainer, logoText, formContainer, input, passwordContainer, passwordInput, eyeButton, loginButton, registerContainer, registerText, registerLink } = styles;
 
@@ -25,12 +27,13 @@ export const LoginScreen = () => {
     }
     
     setLoading(true);
-    const success = await authService.loginUser(username, password);
-    setLoading(false);
-    
-    if (!success) {
+    try {
+      await dispatch(loginAsync({ username, password })).unwrap();
+    } catch {
       Alert.alert('Error', 'Credenciales inválidas');
-    } 
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -90,3 +93,4 @@ export const LoginScreen = () => {
     </KeyboardAvoidingView>
   );
 };
+

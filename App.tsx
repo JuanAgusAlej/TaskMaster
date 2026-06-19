@@ -1,4 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
+import { Provider } from 'react-redux';
+import { store } from './src/store';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { COLORS } from './src/constants/theme';
 import { View, LogBox } from 'react-native';
@@ -12,9 +14,11 @@ LogBox.ignoreLogs([
 
 export default function App() {
   return (
-    <View style={{ flex: 1, backgroundColor: COLORS.background }}>
-      <StatusBar style="light" backgroundColor={COLORS.background} />
-      <AppNavigator />
-    </View>
+    <Provider store={store}>
+      <View style={{ flex: 1, backgroundColor: COLORS.background }}>
+        <StatusBar style="light" backgroundColor={COLORS.background} />
+        <AppNavigator />
+      </View>
+    </Provider>
   );
 }

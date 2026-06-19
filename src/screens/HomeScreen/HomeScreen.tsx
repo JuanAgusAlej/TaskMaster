@@ -7,8 +7,9 @@ import { TaskItem } from '../../components/TaskItem/TaskItem';
 import { TaskItemSkeleton } from '../../components/TaskItemSkeleton/TaskItemSkeleton';
 import { TabSelector } from '../../components/TabSelector/TabSelector';
 import { ConfirmModal } from '../../components/ConfirmModal/ConfirmModal';
-import { taskService } from '../../services/taskService';
-import { authService } from '../../services/authService';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { loadTasks, deleteTaskAsync, updateTaskAsync } from '../../store/taskSlice';
+import { logoutAsync } from '../../store/authSlice';
 import { Task } from '../../types';
 import { COLORS } from '../../constants/theme';
 import { styles } from './style';
@@ -16,10 +17,13 @@ import { styles } from './style';
 import { NavigationProp } from './types';
 
 export const HomeScreen = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const dispatch = useAppDispatch();
+  const tasks = useAppSelector(s => s.tasks.items);
+  const tasksLoading = useAppSelector(s => s.tasks.loading);
+  const username = useAppSelector(s => s.auth.user) ?? '';
+
   const [activeTab, setActiveTab] = useState<'in_progress' | 'completed'>('in_progress');
-  const [loading, setLoading] = useState(true);
-  const [username, setUsername] = useState<string>('');
+  const [tabSwitching, setTabSwitching] = useState(false);
   
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState<'delete' | 'complete'>('delete');
@@ -29,32 +33,22 @@ export const HomeScreen = () => {
 
   const { container, header, userInfo, username: usernameStyle, userEmail, headerActions, headerBtn, headerIcon, divider, centerContent, listContainer, emptyText } = styles;
 
-  const loadData = async () => {
-    setLoading(true);
-    const user = await authService.getCurrentUser();
-    if (user) setUsername(user);
-    
-    const loadedTasks = await taskService.getTasks();
-    setTasks(loadedTasks);
-    setLoading(false);
-  };
-
   useFocusEffect(
     useCallback(() => {
-      loadData();
-    }, [])
+      dispatch(loadTasks());
+    }, [dispatch])
   );
 
   const handleTabChange = (tab: 'in_progress' | 'completed') => {
-    setLoading(true);
+    setTabSwitching(true);
     setActiveTab(tab);
     setTimeout(() => {
-      setLoading(false);
+      setTabSwitching(false);
     }, 500);
   };
 
-  const handleLogout = async () => {
-    await authService.logout();
+  const handleLogout = () => {
+    dispatch(logoutAsync());
   };
 
   const openDeleteModal = (task: Task) => {
@@ -75,18 +69,18 @@ export const HomeScreen = () => {
     setModalVisible(false);
     
     if (modalType === 'delete') {
-      await taskService.deleteTask(selectedTask.id);
+      await dispatch(deleteTaskAsync(selectedTask.id));
     } else if (modalType === 'complete') {
       const updatedTask = { ...selectedTask, completed: !selectedTask.completed };
-      await taskService.updateTask(updatedTask);
+      await dispatch(updateTaskAsync(updatedTask));
     }
-    
-    loadData();
   };
 
   const filteredTasks = tasks.filter(task => 
     activeTab === 'in_progress' ? !task.completed : task.completed
   );
+
+  const showSkeleton = tasksLoading || tabSwitching;
 
   return (
     <View style={container}>
@@ -114,7 +108,7 @@ export const HomeScreen = () => {
 
       <TabSelector activeTab={activeTab} onTabChange={handleTabChange} />
 
-      {loading ? (
+      {showSkeleton ? (
         <View style={[listContainer, { paddingTop: 20 }]}>
           <TaskItemSkeleton />
           <TaskItemSkeleton />
@@ -152,3 +146,4 @@ export const HomeScreen = () => {
     </View>
   );
 };
+
