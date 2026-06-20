@@ -113,3 +113,51 @@ src/
    - *(Opcional)* Si usas un emulador, presiona `a` para Android o `i` para iOS en la terminal de Expo.
 
 ---
+
+## 🧪 Testing y Cobertura (Coverage)
+
+La aplicación cuenta con una suite de pruebas unitarias y de integración desarrolladas con **Jest** y **React Native Testing Library** para asegurar la estabilidad y el correcto funcionamiento del software.
+
+### Ejecutar Pruebas
+Para correr los tests en tu entorno local:
+
+- **Ejecutar todos los tests:**
+  ```bash
+  npm run test
+  ```
+- **Ejecutar en modo interactivo (watch):**
+  ```bash
+  npm run test:watch
+  ```
+- **Generar reporte de cobertura:**
+  ```bash
+  npm run test:coverage
+  ```
+
+### Reporte de Cobertura Actual (Coverage)
+
+El proyecto cuenta con una cobertura global muy alta, superando el **90%** en líneas de código:
+
+| Módulo / Carpeta | % Sentencias (Stmts) | % Ramas (Branch) | % Funciones (Funcs) | % Líneas |
+| :--- | :---: | :---: | :---: | :---: |
+| **Total del Proyecto** | **89.60%** | **79.66%** | **88.55%** | **90.40%** |
+| `components/ConfirmModal` | 100% | 100% | 100% | 100% |
+| `components/ContactPickerModal` | 93.33% | 82.35% | 100% | 93.18% |
+| `components/CustomButton` | 70.58% | 76.00% | 100% | 70.58% |
+| `components/LocationPickerModal` | 76.82% | 69.44% | 77.77% | 77.77% |
+| `components/TabSelector` | 100% | 100% | 100% | 100% |
+| `components/TaskItem` | 100% | 81.48% | 100% | 100% |
+| `components/TaskItemSkeleton` | 100% | 100% | 100% | 100% |
+| `hooks/` | 92.59% | 89.47% | 100% | 100% |
+| `navigation/` | 100% | 100% | 100% | 100% |
+| `screens/AddTaskScreen` | 74.73% | 70.86% | 46.42% | 75.84% |
+| `screens/HomeScreen` | 96.66% | 80.00% | 95.23% | 98.18% |
+| `screens/LoginScreen` | 100% | 87.50% | 100% | 100% |
+| `screens/RegisterScreen` | 100% | 93.33% | 100% | 100% |
+| `screens/TaskDetailScreen` | 94.73% | 71.87% | 100% | 100% |
+| `services/` | 99.49% | 93.05% | 96.77% | 99.47% |
+| `store/` | 100% | 62.50% | 100% | 100% |
+
+- **Estadísticas de ejecución:** 148 pruebas aprobadas (20 suites de test completadas con éxito).
+
+---
