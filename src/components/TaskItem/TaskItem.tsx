@@ -58,7 +58,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             <Text style={assignedText} numberOfLines={1}>📅 Agendado en Calendario</Text>
           )}
           {task.imageUri && (
-            <Image testID="task-image" source={{ uri: task.imageUri }} style={taskImage} />
+            <Text style={assignedText} numberOfLines={1}>📷 Imagen adjuntada</Text>
           )}
         </TouchableOpacity>
 
