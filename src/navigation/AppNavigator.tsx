@@ -25,7 +25,7 @@ export const AppNavigator = () => {
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.background }}>
-        <ActivityIndicator size="large" color={COLORS.accent} />
+        <ActivityIndicator testID="loading-indicator" size="large" color={COLORS.accent} />
       </View>
     );
   }

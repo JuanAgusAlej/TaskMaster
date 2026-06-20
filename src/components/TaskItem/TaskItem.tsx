@@ -20,6 +20,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
       <View style={mainContent}>
         {!task.completed && (
           <TouchableOpacity 
+            testID="task-checkbox"
             style={checkboxContainer} 
             onPress={() => onToggleComplete(task)}
             activeOpacity={0.7}
@@ -57,7 +58,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             <Text style={assignedText} numberOfLines={1}>📅 Agendado en Calendario</Text>
           )}
           {task.imageUri && (
-            <Image source={{ uri: task.imageUri }} style={taskImage} />
+            <Image testID="task-image" source={{ uri: task.imageUri }} style={taskImage} />
           )}
         </TouchableOpacity>
 
