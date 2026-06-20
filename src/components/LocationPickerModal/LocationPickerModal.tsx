@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, Modal, TouchableOpacity, TextInput, ActivityIndicator, Alert, Keyboard } from 'react-native';
 import MapView, { Marker, MapPressEvent, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -18,6 +18,7 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
   const [selectedAddress, setSelectedAddress] = useState('');
   const [region, setRegion] = useState<Region | undefined>(undefined);
   const [loading, setLoading] = useState(false);
+  const mapRef = useRef<MapView>(null);
 
   const {
     overlay, container, header, headerTitle, closeBtn, closeBtnText,
@@ -127,12 +128,14 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
       if (results && results.length > 0) {
         const { latitude, longitude } = results[0];
         const coords = { latitude, longitude };
-        setMarkerCoords(coords);
-        setRegion({
+        const newRegion = {
           ...coords,
           latitudeDelta: 0.00922,
           longitudeDelta: 0.00421,
-        });
+        };
+        setMarkerCoords(coords);
+        setRegion(newRegion);
+        mapRef.current?.animateToRegion(newRegion, 1000);
         await handleReverseGeocode(latitude, longitude);
       } else {
         Alert.alert('Sin resultados', 'No se encontró la dirección ingresada.');
@@ -193,9 +196,9 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
           <View style={mapContainer}>
             {region && (
               <MapView
+                ref={mapRef}
                 style={map}
                 region={region}
-                onRegionChangeComplete={(r) => setRegion(r)}
                 onPress={handleMapPress}
               >
                 {markerCoords && (

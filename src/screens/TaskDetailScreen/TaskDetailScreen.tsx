@@ -106,6 +106,7 @@ export const TaskDetailScreen = () => {
         {task.imageUri && (
           <View style={infoBox}>
             <Text style={infoTitle}>📷 Imagen adjunta</Text>
+            <Image source={{ uri: task.imageUri }} style={detailImage} />
           </View>
         )}
 
