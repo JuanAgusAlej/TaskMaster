@@ -60,7 +60,7 @@ export const CustomButton: React.FC<CustomButtonProps> = ({
       activeOpacity={0.8}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'primary' ? COLORS.background : COLORS.accent} />
+        <ActivityIndicator testID="button-activity-indicator" color={variant === 'primary' ? COLORS.background : COLORS.accent} />
       ) : (
         <>
           {icon}
