@@ -1,6 +1,6 @@
 # TaskMaster Local 🚀
 
-**TaskMaster Local** es una aplicación móvil desarrollada en **React Native (Expo)** orientada a la gestión de tareas personales. La app se destaca por funcionar de manera 100% local, utilizando `AsyncStorage` para la persistencia de datos y ofreciendo un sistema inteligente de notificaciones locales.
+**TaskMaster Local** es una aplicación móvil desarrollada en **React Native (Expo)** orientada a la gestión de tareas personales. La app se destaca por funcionar de manera 100% local y ofrecer un sistema inteligente de notificaciones, integración con funcionalidades nativas del dispositivo y una arquitectura robusta apoyada por herramientas de Inteligencia Artificial.
 
 Este proyecto fue desarrollado como parte de una entrega académica para la materia de Aplicaciones Móviles.
 
@@ -14,31 +14,57 @@ Este proyecto fue desarrollado como parte de una entrega académica para la mate
 - **🔐 Autenticación Local:** 
   - Registro e Inicio de sesión simulado y persistido en el dispositivo.
   - Protección de rutas: no se puede acceder a las tareas sin iniciar sesión.
-- **📝 Gestión de Tareas (CRUD):** 
+- **📝 Gestión de Tareas Avanzada (CRUD):** 
   - Listado de tareas activas y completadas.
-  - Creación de nuevas tareas con título y descripción.
+  - Creación de tareas con título, descripción y validación de formularios.
+  - Asignación de **Contactos** del dispositivo a las tareas.
+  - Adjuntar **Imágenes o Fotos** desde la cámara o galería.
+  - Registro de **Ubicación** asociada a la tarea visible mediante mapas.
   - Eliminación y marcado de estado de tareas con animaciones fluidas (esqueletos de carga).
 - **⏰ Sistema Híbrido de Recordatorios:**
-  - **Temporizador (Hoy):** Permite configurar un recordatorio dinámico en horas, minutos y/o segundos que disparará una notificación push local al cumplirse el tiempo.
-  - **Programación (Seleccionar Día):** Permite elegir una fecha y hora futura estricta (usando el calendario del sistema) para el recordatorio.
+  - **Temporizador (Hoy):** Configuración de un recordatorio dinámico en horas, minutos y/o segundos (notificación push local).
+  - **Programación (Seleccionar Día):** Selección de fecha y hora futura estricta con integración directa al **Calendario Nativo** del sistema.
 - **🎨 Interfaz Moderna y Oscura:**
   - Diseño *Dark Mode* premium con acentos en naranja neón (`#FF6B00`).
   - Navegación fluida por pestañas y stack.
   - Totalmente localizada al español.
 
+## 🤖 Asistencia de Inteligencia Artificial (IA)
+
+Durante el ciclo de vida de desarrollo de **TaskMaster**, se utilizaron herramientas de Inteligencia Artificial para asistir en la programación, arquitectura y diseño.
+
+- **Asistente**: Antigravity (Google DeepMind Agentic Coding Assistant)
+- **Rol**: Pair Programmer / Desarrollador Full-Stack React Native
+- **Metodología**: Se siguió el enfoque **Software Concept & Execution Plan (SCEP)**, donde el desarrollador principal establecía los requerimientos de negocio y arquitectura, y la IA planificaba la implementación técnica, solicitaba aprobación y ejecutaba el código correspondiente.
+- **Historial y Planificación**: Todos los planes de implementación y los prompts específicos utilizados para guiar el desarrollo de cada módulo pueden ser consultados en las carpetas correspondientes de `ia_docs/` (`ia_docs/plan/` e `ia_docs/Prompt/` respectivamente).
+
+### Principales Contribuciones de la IA
+1. **Estructura y Arquitectura**: Refactorización de la aplicación hacia un modelo altamente modular, migración de la gestión de estado a **Redux Toolkit** y desarrollo de tests unitarios con **Jest**.
+2. **Desarrollo de UI/UX**: Creación de esqueletos de carga animados (*Skeletons*) y la integración de íconos nativos (`@expo/vector-icons`).
+3. **Lógica de Negocio e Integraciones**: Implementación de la compleja integración de módulos nativos (Cámara/Galería, Contactos, Ubicación y Calendario).
+4. **Recursos Visuales**: Generación del logotipo minimalista de la app y la pantalla de carga (*Splash Screen*) mediante modelos de generación de imágenes por prompt.
+
+> **Prompt utilizado para generar esta documentación:**
+> *"Analiza el estado actual del proyecto y actualiza el archivo README.md de forma completa. Agrega un apartado específico detallando el uso de Inteligencia Artificial, incorporando la información de la documentación ubicada en la carpeta `ia_docs`. Además, incluye este mismo prompt redactado de una manera más clara, profesional y descriptiva."*
+
 ## 🎨 Diseño UI/UX (Figma)
 El diseño base y los prototipos de la aplicación fueron creados en Figma. Podés explorar el archivo de diseño aquí:
 [Ver prototipo en Figma](https://www.figma.com/design/RKEVMoeaQyWNyVInNUN1oC/Untitled?m=auto&t=yxImqgsNAjrQ91sM-1)
-
 
 ## 🛠️ Stack Tecnológico
 
 - **Framework:** [React Native](https://reactnative.dev/) mediante [Expo](https://expo.dev/) (Managed Workflow)
 - **Lenguaje:** TypeScript
 - **Navegación:** React Navigation (Native Stack)
+- **Gestión de Estado:** Redux Toolkit
 - **Persistencia de Datos:** `@react-native-async-storage/async-storage`
-- **Notificaciones Locales:** `expo-notifications`
-- **Gestión de Fechas:** `@react-native-community/datetimepicker`
+- **Integraciones Nativas:** 
+  - `expo-notifications` (Notificaciones locales)
+  - `expo-image-picker` (Cámara y Galería)
+  - `expo-contacts` (Contactos del dispositivo)
+  - `expo-location` y `react-native-maps` (Geolocalización)
+  - `expo-calendar` (Calendario del sistema)
+- **Testing:** Jest
 - **Iconografía:** `@expo/vector-icons` (Ionicons)
 
 ## 🏗️ Estructura del Proyecto
@@ -49,9 +75,11 @@ El proyecto sigue una arquitectura fuertemente modular para asegurar la escalabi
 src/
 ├── components/      # Componentes reutilizables (Botones, Items de Lista, Modales)
 ├── constants/       # Variables globales (Tema, colores, tipografía)
+├── hooks/           # Custom hooks para lógica reutilizable
 ├── navigation/      # Configuración de React Navigation y protección de rutas
 ├── screens/         # Pantallas principales (Login, Home, AddTask, etc.)
-├── services/        # Lógica de negocio y persistencia (Auth, Tareas, Notificaciones)
+├── services/        # Lógica de negocio (Auth, Tareas, Notificaciones, etc.)
+├── store/           # Configuración de Redux Toolkit (Slices, Store)
 └── types/           # Interfaces de TypeScript globales
 ```
 
