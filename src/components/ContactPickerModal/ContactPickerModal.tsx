@@ -115,6 +115,8 @@ export const ContactPickerModal: React.FC<ContactPickerModalProps> = ({
     </TouchableOpacity>
   );
 
+  if (!visible) return null;
+
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <View style={overlay}>

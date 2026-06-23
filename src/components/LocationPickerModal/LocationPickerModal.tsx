@@ -166,6 +166,8 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
     });
   };
 
+  if (!visible) return null;
+
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <View style={overlay}>
